@@ -1,7 +1,7 @@
 {
   "redirects": [
     {
-      "source": "/aprc/:branch",
+      "source": "/:branch",
       "destination": "https://script.google.com/macros/s/AKfycbwIZSL99pup3QqcOYcoM3XUpiwfG4e3QxBQTekfr2HYimAqOAgr1GWQGNRFMZo8XIA4/exec?branch=:branch",
       "permanent": false
     }
