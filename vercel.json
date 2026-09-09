@@ -1,23 +1,8 @@
 {
   "redirects": [
     {
-      "source": "/aprc-nfc",
-      "destination": "https://script.google.com/macros/s/AKfycbwIZSL99pup3QqcOYcoM3XUpiwfG4e3QxBQTekfr2HYimAqOAgr1GWQGNRFMZo8XIA4/exec?branch=NFC",
-      "permanent": false
-    },
-    {
-      "source": "/aprc-greencity",
-      "destination": "https://script.google.com/macros/s/AKfycbwIZSL99pup3QqcOYcoM3XUpiwfG4e3QxBQTekfr2HYimAqOAgr1GWQGNRFMZo8XIA4/exec?branch=Green%20City%20Hospital",
-      "permanent": false
-    },
-    {
-      "source": "/aprc-jr",
-      "destination": "https://script.google.com/macros/s/AKfycbwIZSL99pup3QqcOYcoM3XUpiwfG4e3QxBQTekfr2HYimAqOAgr1GWQGNRFMZo8XIA4/exec?branch=JR%20Hospital",
-      "permanent": false
-    },
-    {
-      "source": "/aprc-gamma2",
-      "destination": "https://script.google.com/macros/s/AKfycbwIZSL99pup3QqcOYcoM3XUpiwfG4e3QxBQTekfr2HYimAqOAgr1GWQGNRFMZo8XIA4/exec?branch=Gamma-2%20Greater%20Noida",
+      "source": "/aprc/:branch",
+      "destination": "https://script.google.com/macros/s/YOUR_ID/exec?branch=:branch",
       "permanent": false
     }
   ]
