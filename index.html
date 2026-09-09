@@ -1,53 +1,372 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+<base target="_top">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>APRC — Check-in links</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--navy:#0E2947;--teal:#1D9E75;--ink:#12202F;--muted:#5F6B78;--line:#DDE3E9;--field:#F4F7F9}
-  *{box-sizing:border-box}
-  body{margin:0;background:#fff;color:var(--ink);
-       font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:17px;line-height:1.5}
-  .wrap{max-width:520px;margin:0 auto;padding:36px 20px 64px}
-  .brand{font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
-  h1{font-size:29px;font-weight:700;color:var(--navy);margin:8px 0 6px;letter-spacing:-.02em}
-  .sub{color:var(--muted);font-size:15.5px;margin:0 0 28px}
-  a.branch{display:block;text-decoration:none;background:var(--field);border:1.5px solid var(--line);
-           border-radius:14px;padding:20px;margin-bottom:12px;color:inherit}
-  a.branch:hover{border-color:var(--teal);background:#F2F8F5}
-  .bname{font-size:20px;font-weight:700;color:var(--navy)}
-  .bhint{font-size:14px;color:var(--muted);margin-top:3px}
-  .note{margin-top:32px;padding-top:20px;border-top:1.5px solid var(--line);font-size:14px;color:var(--muted)}
+  :root{
+    --navy:#0E2947;
+    --teal:#1D9E75;
+    --ink:#12202F;
+    --muted:#5F6B78;
+    --line:#DDE3E9;
+    --field:#F4F7F9;
+    --warn:#B4451F;
+    --page:#FFFFFF;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;background:var(--page);color:var(--ink);
+    font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    font-size:17px;line-height:1.5;
+  }
+  .wrap{max-width:460px;margin:0 auto;padding:28px 20px 64px}
+
+  header{margin-bottom:28px}
+  .logo{display:block;max-height:56px;max-width:200px;width:auto;margin:0 0 16px;object-fit:contain}
+  .clinic{font-size:15px;font-weight:600;color:var(--muted);letter-spacing:.01em}
+  h1{font-size:30px;line-height:1.15;font-weight:700;color:var(--navy);margin:6px 0 8px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:15.5px;margin:0}
+
+  .screen{display:none}
+  .screen.on{display:block}
+
+  label{display:block;font-size:14.5px;font-weight:600;color:var(--navy);margin:18px 0 7px}
+  .opt{font-weight:500;color:var(--muted)}
+  input,select,textarea{
+    width:100%;font:inherit;font-size:17px;color:var(--ink);
+    background:var(--field);border:1.5px solid var(--line);border-radius:12px;
+    padding:15px 14px;outline:none;
+  }
+  textarea{min-height:92px;resize:vertical}
+  input:focus,select:focus,textarea:focus{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(29,158,117,.16)}
+  input[inputmode="numeric"]{letter-spacing:.06em}
+
+  .phonebox{display:flex;align-items:center;gap:0;background:var(--field);border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+  .phonebox:focus-within{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px rgba(29,158,117,.16)}
+  .cc{padding:15px 4px 15px 14px;color:var(--muted);font-weight:600}
+  .phonebox input{border:0;background:transparent;box-shadow:none;padding-left:6px;font-size:21px;font-weight:600}
+  .phonebox input:focus{box-shadow:none}
+
+  .btn{
+    display:block;width:100%;margin-top:26px;padding:17px;border:0;border-radius:12px;
+    background:var(--teal);color:#fff;font:inherit;font-size:17.5px;font-weight:700;cursor:pointer;
+  }
+  .btn:disabled{opacity:.55;cursor:default}
+  .btn.ghost{background:transparent;color:var(--navy);border:1.5px solid var(--line);margin-top:12px;font-weight:600}
+
+  .card{background:#F2F8F5;border:1.5px solid #CBE5D9;border-radius:14px;padding:18px 18px 16px;margin-top:22px}
+  .card .who{font-size:23px;font-weight:700;color:var(--navy);letter-spacing:-.01em}
+  .card .meta{font-size:14.5px;color:var(--muted);margin-top:4px}
+
+  .rowmini{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .rowmini label{margin-top:18px}
+
+  .err{margin-top:14px;color:var(--warn);font-size:15px;font-weight:600;display:none}
+  .err.on{display:block}
+
+  .consent{display:flex;gap:11px;align-items:flex-start;margin-top:22px;font-size:14.5px;color:var(--muted);line-height:1.45}
+  .consent input{width:22px;height:22px;flex:0 0 auto;margin-top:1px;accent-color:var(--teal)}
+
+  .done{text-align:center;padding-top:36px}
+  .tick{width:64px;height:64px;margin:0 auto 20px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center}
+  .tick svg{width:32px;height:32px}
+  .done h2{font-size:27px;color:var(--navy);margin:0 0 8px;font-weight:700}
+  .queue{font-size:15px;color:var(--muted);margin-top:16px}
+  .pid{display:inline-block;margin-top:14px;background:var(--field);border:1.5px solid var(--line);border-radius:10px;padding:9px 14px;font-weight:700;color:var(--navy);letter-spacing:.03em}
+
+  footer{margin-top:44px;padding-top:20px;border-top:1.5px solid var(--line);text-align:center}
+  footer .pb{font-size:12.5px;color:var(--muted);letter-spacing:.02em}
+  footer .pb b{color:var(--teal);font-weight:700;letter-spacing:.06em}
+  footer .tevio{display:block;height:22px;width:auto;margin:6px auto 0;opacity:.9}
+  footer .privacy{font-size:11.5px;color:var(--muted);margin-top:7px;line-height:1.45;opacity:.85}
+
+  .spin{display:none;margin-top:20px;color:var(--muted);font-size:15px;font-weight:600}
+  .spin.on{display:block}
+  @media (prefers-reduced-motion:no-preference){
+    .screen.on{animation:in .18s ease-out}
+    @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="brand">Tevio</div>
-  <h1>APRC patient check-in</h1>
-  <p class="sub">Pick the branch you are at. Bookmark this page on the reception device.</p>
 
-  <a class="branch" href="/aprc/nfc">
-    <div class="bname">NFC</div>
-    <div class="bhint">tevio.in/aprc/nfc</div>
-  </a>
-  <a class="branch" href="/aprc/greencity">
-    <div class="bname">Green City Hospital</div>
-    <div class="bhint">tevio.in/aprc/greencity</div>
-  </a>
-  <a class="branch" href="/aprc/jr">
-    <div class="bname">JR Hospital</div>
-    <div class="bhint">tevio.in/aprc/jr</div>
-  </a>
-  <a class="branch" href="/aprc/gamma2">
-    <div class="bname">Gamma-2 Greater Noida</div>
-    <div class="bhint">tevio.in/aprc/gamma2</div>
-  </a>
+  <header>
+    <? if (logoUrl) { ?>
+      <img class="logo" src="<?= logoUrl ?>" alt="<?= clinicName ?>">
+    <? } ?>
+    <div class="clinic"><?= clinicName ?></div>
+    <h1 id="head">Check in for your visit</h1>
+    <p class="sub" id="subhead">Takes about 30 seconds. Start with your mobile number.</p>
+  </header>
 
-  <p class="note">For reception use. Patients scan the QR code at the desk instead.</p>
+  <!-- 1. PHONE -->
+  <section id="s-phone" class="screen on">
+    <label for="phone">Mobile number</label>
+    <div class="phonebox">
+      <span class="cc">+91</span>
+      <input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="98765 43210" autocomplete="tel">
+    </div>
+    <div class="err" id="e-phone"></div>
+    <div class="spin" id="sp-phone">Checking your records…</div>
+    <button class="btn" id="b-phone">Continue</button>
+  </section>
+
+  <!-- 2. CONFIRM RETURNING PATIENT -->
+  <section id="s-confirm" class="screen">
+    <div class="card">
+      <div class="who" id="c-name"></div>
+      <div class="meta" id="c-meta"></div>
+    </div>
+    <button class="btn" id="b-yes">Yes, that's me</button>
+    <button class="btn ghost" id="b-no">Not me — use a different number</button>
+  </section>
+
+  <!-- 3. NEW PATIENT REGISTRATION -->
+  <section id="s-register" class="screen">
+    <label for="name">Full name</label>
+    <input id="name" type="text" autocomplete="name" placeholder="As you'd like it on your file">
+
+    <div class="rowmini">
+      <div>
+        <label for="age">Age</label>
+        <input id="age" type="tel" inputmode="numeric" maxlength="3" placeholder="34">
+      </div>
+      <div>
+        <label for="gender">Gender</label>
+        <select id="gender">
+          <option value="">Select</option>
+          <option>Female</option>
+          <option>Male</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <label for="address">Area / locality <span class="opt">(optional)</span></label>
+    <input id="address" type="text" placeholder="Indirapuram, Ghaziabad">
+
+    <label for="referredBy">Who referred you? <span class="opt">(optional)</span></label>
+    <input id="referredBy" type="text" placeholder="Doctor, friend, Google, Practo">
+
+    <label for="emergency">Emergency contact <span class="opt">(optional)</span></label>
+    <input id="emergency" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit number">
+
+    <div class="consent">
+      <input id="consent" type="checkbox">
+      <label for="consent" style="margin:0;font-weight:500;color:var(--muted)">
+        I allow <?= clinicName ?> to store these details and contact me about my treatment.
+      </label>
+    </div>
+    <div class="err" id="e-reg"></div>
+    <button class="btn" id="b-reg">Continue to visit details</button>
+  </section>
+
+  <!-- 4. VISIT DETAILS -->
+  <section id="s-visit" class="screen">
+    <label for="service">What are you here for?</label>
+    <select id="service">
+      <? services.forEach(function(s){ ?>
+        <option><?= s ?></option>
+      <? }); ?>
+    </select>
+
+    <label for="practitioner">Practitioner</label>
+    <select id="practitioner">
+      <? practitioners.forEach(function(p){ ?>
+        <option><?= p ?></option>
+      <? }); ?>
+    </select>
+
+    <label for="painLevel">Pain right now <span class="opt">(0 = none, 10 = worst)</span></label>
+    <select id="painLevel">
+      <option value="">Skip</option>
+      <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+      <option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+    </select>
+
+    <label for="complaint">Anything the therapist should know? <span class="opt">(optional)</span></label>
+    <textarea id="complaint" placeholder="Lower back pain since 3 weeks, worse after sitting"></textarea>
+
+    <div class="err" id="e-visit"></div>
+    <div class="spin" id="sp-visit">Saving your check-in…</div>
+    <button class="btn" id="b-visit">Submit check-in</button>
+  </section>
+
+  <!-- 5. DONE -->
+  <section id="s-done" class="screen">
+    <div class="done">
+      <div class="tick">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <h2 id="d-title">You're checked in</h2>
+      <p class="sub" id="d-msg">Please take a seat. The front desk has your details.</p>
+      <div class="pid" id="d-pid"></div>
+      <div class="queue" id="d-queue"></div>
+    </div>
+  </section>
+
+  <footer>
+    <? if (tevioLogoUrl) { ?>
+      <div class="pb">Powered by</div>
+      <img class="tevio" src="<?= tevioLogoUrl ?>" alt="Tevio">
+    <? } else { ?>
+      <div class="pb">Powered by <b>TEVIO</b></div>
+    <? } ?>
+    <div class="privacy">Your details are stored securely by <?= clinicName ?> and used only for your treatment and appointment reminders.</div>
+  </footer>
+
 </div>
+
+<script>
+  var BRANCH = '<?= branch ?>';
+  var SOURCE = '<?= source ?>';
+  var state = { phone:'', isNew:true, patientId:'' };
+
+  function $(id){ return document.getElementById(id); }
+  function show(id){
+    ['s-phone','s-confirm','s-register','s-visit','s-done'].forEach(function(s){
+      $(s).classList.toggle('on', s === id);
+    });
+    window.scrollTo(0,0);
+  }
+  function err(id, msg){
+    var el = $(id);
+    el.textContent = msg || '';
+    el.classList.toggle('on', !!msg);
+  }
+  function busy(spinId, btnId, on){
+    $(spinId).classList.toggle('on', on);
+    $(btnId).disabled = on;
+  }
+
+  // --- Step 1: phone lookup ---
+  $('phone').addEventListener('input', function(){
+    this.value = this.value.replace(/\D/g,'').slice(0,10);
+    err('e-phone','');
+  });
+  $('phone').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') $('b-phone').click();
+  });
+
+  $('b-phone').addEventListener('click', function(){
+    var v = $('phone').value.replace(/\D/g,'');
+    if (!/^[6-9]\d{9}$/.test(v)) { err('e-phone','Enter a valid 10-digit mobile number.'); return; }
+    busy('sp-phone','b-phone',true);
+    google.script.run
+      .withSuccessHandler(onLookup)
+      .withFailureHandler(function(e){
+        busy('sp-phone','b-phone',false);
+        err('e-phone','Network problem. Check your signal and tap Continue again.');
+      })
+      .lookupPatient(v);
+  });
+
+  function onLookup(res){
+    busy('sp-phone','b-phone',false);
+    if (!res.ok) { err('e-phone', res.error); return; }
+    state.phone = res.phone;
+
+    if (!res.found) {
+      state.isNew = true;
+      $('head').textContent = 'First visit — a few details';
+      $('subhead').textContent = 'We only ask this once. Next time your number is enough.';
+      show('s-register');
+      return;
+    }
+
+    state.isNew = false;
+    state.patientId = res.patientId;
+
+    if (res.alreadyCheckedIn) {
+      $('d-title').textContent = 'Already checked in';
+      $('d-msg').textContent = 'We have your check-in for today. Please see the front desk if something has changed.';
+      $('d-pid').textContent = res.patientId;
+      $('d-queue').textContent = '';
+      show('s-done');
+      return;
+    }
+
+    $('c-name').textContent = res.displayName;
+    $('c-meta').textContent = res.lastVisit
+      ? 'Registered patient · Last visit ' + res.lastVisit
+      : 'Registered patient';
+    show('s-confirm');
+  }
+
+  $('b-yes').addEventListener('click', function(){
+    $('head').textContent = 'Today\u2019s visit';
+    $('subhead').textContent = 'Just three quick things and you\u2019re done.';
+    show('s-visit');
+  });
+
+  $('b-no').addEventListener('click', function(){
+    $('phone').value = '';
+    $('head').textContent = 'Check in for your visit';
+    $('subhead').textContent = 'Takes about 30 seconds. Start with your mobile number.';
+    show('s-phone');
+    $('phone').focus();
+  });
+
+  // --- Step 2: registration ---
+  $('b-reg').addEventListener('click', function(){
+    if (!$('name').value.trim()) { err('e-reg','Name is required.'); return; }
+    if (!$('consent').checked) { err('e-reg','Please tick the consent box to continue.'); return; }
+    err('e-reg','');
+    $('head').textContent = 'Today\u2019s visit';
+    $('subhead').textContent = 'Last step.';
+    show('s-visit');
+  });
+
+  // --- Step 3: submit ---
+  $('b-visit').addEventListener('click', function(){
+    busy('sp-visit','b-visit',true);
+    err('e-visit','');
+    var payload = {
+      phone: state.phone,
+      isNew: state.isNew,
+      patientId: state.patientId,
+      name: $('name').value,
+      age: $('age').value,
+      gender: $('gender').value,
+      address: $('address').value,
+      referredBy: $('referredBy').value,
+      emergency: $('emergency').value,
+      consent: $('consent').checked,
+      service: $('service').value,
+      practitioner: $('practitioner').value,
+      painLevel: $('painLevel').value,
+      complaint: $('complaint').value,
+      branch: BRANCH,
+      source: SOURCE
+    };
+    google.script.run
+      .withSuccessHandler(onSubmit)
+      .withFailureHandler(function(){
+        busy('sp-visit','b-visit',false);
+        err('e-visit','Could not save. Check your signal and tap Submit again.');
+      })
+      .submitCheckIn(payload);
+  });
+
+  function onSubmit(res){
+    busy('sp-visit','b-visit',false);
+    if (!res.ok) { err('e-visit', res.error); return; }
+    if (res.duplicate) {
+      $('d-title').textContent = 'Already checked in';
+      $('d-msg').textContent = 'We already have your check-in for today.';
+    } else if (res.isNew) {
+      $('d-title').textContent = 'You\u2019re registered and checked in';
+      $('d-msg').textContent = 'Save this patient ID. Next time, your mobile number is all we need.';
+    }
+    $('d-pid').textContent = res.patientId || '';
+    $('d-queue').textContent = res.queueNo ? 'You are number ' + res.queueNo + ' today.' : '';
+    show('s-done');
+  }
+</script>
 </body>
 </html>
